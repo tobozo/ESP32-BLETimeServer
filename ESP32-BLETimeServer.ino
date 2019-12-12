@@ -64,8 +64,12 @@ typedef struct {
     uint8_t seconds;
     uint8_t wday;
     uint8_t fraction;
+    uint8_t tz;
     uint8_t adjust = 0;
 } bt_time_t;
+
+
+int8_t timeZone = 1; // 1 = GMT + 1, 2 = GMT + 2, etc
 
 BLEService* pService;
 BLEServer* pServer;
@@ -97,6 +101,7 @@ void timeServerTask(void *p) {
     _time.minutes = _t->tm_min;
     _time.seconds = _t->tm_sec;
     _time.fraction = tv.tv_usec * 256 /1000000;
+    _time.tz = timeZone;
     ((BLECharacteristic*)p)->setValue((uint8_t*)&_time, sizeof(bt_time_t));
     ((BLECharacteristic*)p)->notify();
     // send notification with date/time exactly every TICKS_TO_DELAY ms
